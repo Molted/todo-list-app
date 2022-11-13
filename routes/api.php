@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\TodoController;
+use App\Http\Controllers\API\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\FlareClient\Api;
@@ -21,3 +22,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('todos', TodoController::class);
+
+Route::controller(AuthController::class)->group(function(){
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::post('logout', 'logout');
+    Route::post('refresh', 'refresh');
+    Route::put('update-profile/{user}', 'updateProfile');
+});

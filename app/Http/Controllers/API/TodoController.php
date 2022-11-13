@@ -22,7 +22,6 @@ class TodoController extends Controller
     {
         $todos = Todo::all();
         $user = auth()->user();
-        dd($user);
         return response()->json([
             'status' => true,
             'todos' => $todos,

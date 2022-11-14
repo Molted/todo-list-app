@@ -1,5 +1,4 @@
 # Todo list API with JWT Authentication ⚙️
----
 
 ## Endpoints
 

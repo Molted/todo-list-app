@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TodoRequest;
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Resources\TodoResource;
+use Illuminate\Support\Facades\DB;
+use Laravel\Ui\Presets\React;
 
 class TodoController extends Controller
 {
@@ -18,15 +22,36 @@ class TodoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $todos = Todo::all();
-        $user = auth()->user();
-        return response()->json([
-            'status' => true,
-            'todos' => $todos,
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $orderBy = $request->query('order_by', 'ASC');
+        $sortBy = $request->query('sort_by', 'id');
+
+        if (empty($request->query('offset', 0))) {
+            $offset = ($page - 1) * $perPage;
+        } else {
+            $offset = $request->query('offset', 0);
+        }
+
+        $items = Todo::offset($offset)->limit($perPage)
+            ->orderBy($sortBy, $orderBy)
+            ->get();
+        $totalTodos = $items->count();
+        // $totalPages = ceil($totalTodos / $perPage);
+
+        $todos = new LengthAwarePaginator($items, $totalTodos, $perPage, $page, [
+            'path' => $request->url(),
+            'query' => $request->query(),
         ]);
+
+        return TodoResource::collection($todos);
     }
+
+    // protected function offset() {
+
+    // }
 
     /**
      * Store a newly created resource in storage.
